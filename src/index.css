@@ -1,0 +1,91 @@
+@import './styles/theme.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
+    --primary: 221 83% 53%; /* Indigo */
+    --primary-foreground: 0 0% 98%;
+    --primary-rgb: 67, 56, 202;
+    --secondary: 169 80% 40%; /* Teal */
+    --secondary-foreground: 0 0% 9%;
+    --secondary-rgb: 13, 148, 136;
+    --accent: 266 70% 55%; /* Purple */
+    --accent-foreground: 0 0% 98%;
+    --accent-rgb: 139, 92, 246;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 221 83% 53%;
+    --radius: 0.5rem;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+  }
+
+  .dark {
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 221 83% 65%; /* Lighter indigo for dark mode */
+    --primary-foreground: 0 0% 9%;
+    --primary-rgb: 129, 117, 242;
+    --secondary: 169 80% 50%; /* Lighter teal for dark mode */
+    --secondary-foreground: 0 0% 9%;
+    --secondary-rgb: 20, 184, 166;
+    --accent: 266 70% 65%; /* Lighter purple for dark mode */
+    --accent-foreground: 0 0% 9%;
+    --accent-rgb: 169, 134, 255;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 221 83% 65%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Custom styles for futuristic look */
+.futuristic-card {
+  @apply border border-border/50 bg-card/60 backdrop-blur-lg rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl;
+}
+
+.futuristic-button {
+  @apply transition-all duration-200 hover:scale-105 focus:ring-2 focus:ring-primary/50;
+}
+
+.futuristic-input {
+  @apply border border-border/50 bg-background/50 backdrop-blur-sm rounded-lg transition-all duration-200 focus:ring-2 focus:ring-primary/50 focus:border-primary;
+}
+
+.futuristic-gradient-text {
+  @apply bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent;
+}

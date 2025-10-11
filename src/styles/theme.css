@@ -1,0 +1,101 @@
+/* Modern Futuristic Theme with Gradients and Glass Blur Effects */
+
+/* Glass blur effects */
+.glass-blur {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.glass-blur-lg {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.glass-blur-xl {
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+/* Gradient backgrounds */
+.gradient-primary {
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)));
+}
+
+.gradient-secondary {
+  background: linear-gradient(135deg, hsl(var(--secondary)), hsl(var(--accent)));
+}
+
+.gradient-accent {
+  background: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--primary)));
+}
+
+/* Text gradients */
+.text-gradient-primary {
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-secondary {
+  background: linear-gradient(135deg, hsl(var(--secondary)), hsl(var(--accent)));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Shadow effects */
+.shadow-glow {
+  box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.3);
+}
+
+.shadow-glow-secondary {
+  box-shadow: 0 0 15px rgba(var(--secondary-rgb), 0.3);
+}
+
+.shadow-glow-accent {
+  box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.3);
+}
+
+/* Border gradients */
+.border-gradient {
+  border: 1px solid transparent;
+  background: linear-gradient(hsl(var(--background)), hsl(var(--background))) padding-box,
+              linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary))) border-box;
+}
+
+/* Hover effects */
+.hover-scale {
+  transition: transform 0.2s ease-in-out;
+}
+
+.hover-scale:hover {
+  transform: scale(1.05);
+}
+
+.hover-glow {
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.3);
+}
+
+/* Animated gradients */
+.animated-gradient {
+  background: linear-gradient(-45deg, hsl(var(--primary)), hsl(var(--secondary)), hsl(var(--accent)), hsl(var(--primary)));
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}

@@ -1,13 +1,13 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { 
-  Home, 
-  Pill, 
-  Calendar, 
-  BarChart3, 
-  Brain, 
-  Settings, 
-  User, 
+import {
+  Home,
+  Pill,
+  Calendar,
+  BarChart3,
+  Brain,
+  Settings,
+  User,
   FileText,
   Bell,
   Stethoscope,
@@ -27,8 +27,7 @@ const Sidebar = () => {
     { name: 'Dashboard', href: '/', icon: Home },
     { name: 'Medications', href: '/medications', icon: Pill },
     { name: 'Reminders', href: '/reminders', icon: Bell },
-    { name: 'Prescriptions', href: '/prescriptions', icon: FileText },
-    { name: 'Health AI', href: '/ai', icon: Brain },
+    { name: 'All Documents', href: '/documents', icon: FileText },
     { name: 'Analytics', href: '/analytics', icon: BarChart3 },
     { name: 'Health Monitor', href: '/monitor', icon: Activity },
     { name: 'Doctors', href: '/doctors', icon: Stethoscope },
@@ -51,7 +50,7 @@ const Sidebar = () => {
             </span>
           </div>
         </div>
-        
+
         <div className="flex flex-col flex-1 overflow-y-auto pt-5 pb-4">
           <nav className="flex-1 px-2 space-y-1">
             {navigationItems.map((item) => {
@@ -72,12 +71,20 @@ const Sidebar = () => {
               );
             })}
           </nav>
-          
+
           <div className="mt-auto p-4 border-t">
             <div className="flex items-center">
-              <div className="bg-gradient-to-r from-primary to-secondary text-primary-foreground rounded-full h-10 w-10 flex items-center justify-center shadow">
-                {user?.displayName ? user.displayName.charAt(0) : user?.email?.charAt(0) || 'U'}
-              </div>
+              {user?.photoURL ? (
+                <img
+                  src={user.photoURL}
+                  alt="Profile"
+                  className="rounded-full h-10 w-10 shadow"
+                />
+              ) : (
+                <div className="bg-gradient-to-r from-primary to-secondary text-primary-foreground rounded-full h-10 w-10 flex items-center justify-center shadow">
+                  {user?.displayName ? user.displayName.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase() || 'U'}
+                </div>
+              )}
               <div className="ml-3">
                 <p className="text-sm font-medium">
                   {user?.displayName || 'User'}
@@ -87,7 +94,7 @@ const Sidebar = () => {
                 </p>
               </div>
             </div>
-            
+
             <Link to="/settings">
               <Button variant="outline" className="w-full mt-4 transition-all duration-200 hover:shadow-md">
                 <Settings className="h-4 w-4 mr-2" />

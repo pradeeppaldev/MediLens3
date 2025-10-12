@@ -44,14 +44,16 @@ export const unsplash = {
   }
 };
 
+import { GoogleGenAI } from '@google/genai';
+
 /**
- * OpenAI API integration
+ * Gemini API integration
  */
-export const openai = {
+export const gemini = {
   // Analyze medical image description
   analyzeImage: async (imageData) => {
     try {
-      // In a real implementation, you would call the OpenAI API
+      // In a real implementation, you would call the Gemini API
       // For now, we'll return placeholder data
       return {
         analysis: 'This appears to be a medical image showing normal anatomical structures. No abnormalities detected.',
@@ -64,6 +66,34 @@ export const openai = {
     } catch (error) {
       console.error('Error analyzing image:', error);
       return null;
+    }
+  },
+
+  // Chat with AI assistant
+  chat: async (messages) => {
+    console.log('chat function called with messages:', messages);
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    console.log('API key present:', !!apiKey);
+    if (!apiKey) {
+      throw new Error('Gemini API key is not configured. Please add VITE_GEMINI_API_KEY to your .env file.');
+    }
+
+    try {
+      const ai = new GoogleGenAI({ apiKey });
+      const conversation = messages.map(msg => `${msg.type === 'ai' ? 'Assistant' : 'User'}: ${msg.content}`).join('\n');
+      console.log('Conversation:', conversation);
+      const prompt = `You are a helpful AI health assistant. Provide accurate, empathetic, and general health information. Always recommend consulting a healthcare professional for medical advice. Do not diagnose or prescribe treatments.\n\n${conversation}\nAssistant:`;
+      console.log('Prompt to API:', prompt);
+
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: prompt,
+      });
+      console.log('API response text:', response.text);
+      return response.text.trim();
+    } catch (error) {
+      console.error('Error calling Gemini API:', error);
+      throw error;
     }
   }
 };
@@ -90,6 +120,6 @@ export const ocr = {
 
 export default {
   unsplash,
-  openai,
+  gemini,
   ocr
 };

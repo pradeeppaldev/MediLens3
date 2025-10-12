@@ -44,7 +44,6 @@ const Navbar = () => {
   const navItems = [
     { name: 'Home', path: '/', icon: Home },
     { name: 'Medications', path: '/medications', icon: Pill },
-    { name: 'Health AI', path: '/ai', icon: Brain },
     { name: 'Profile', path: '/profile', icon: User },
     { name: 'Settings', path: '/settings', icon: Settings },
   ];
@@ -101,9 +100,17 @@ const Navbar = () => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full transition-transform hover:scale-105">
-                  <div className="bg-gradient-to-r from-primary to-secondary text-primary-foreground rounded-full h-8 w-8 flex items-center justify-center shadow">
-                    {user.displayName ? user.displayName.charAt(0) : user.email?.charAt(0) || 'U'}
-                  </div>
+                  {user?.photoURL ? (
+                    <img
+                      src={user.photoURL}
+                      alt="Profile"
+                      className="rounded-full h-8 w-8 object-cover shadow"
+                    />
+                  ) : (
+                    <div className="bg-gradient-to-r from-primary to-secondary text-primary-foreground rounded-full h-8 w-8 flex items-center justify-center shadow">
+                      {user?.displayName ? user.displayName.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase() || 'U'}
+                    </div>
+                  )}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>

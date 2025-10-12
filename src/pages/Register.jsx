@@ -75,6 +75,10 @@ const Register = () => {
         setError('Popup closed by user. Please try again.');
       } else if (err.code === 'auth/account-exists-with-different-credential') {
         setError('Account exists with different credentials. Please sign in using the original method.');
+      } else if (err.code === 'auth/unauthorized-domain') {
+        setError('Google sign-in is not authorized for this domain. Please contact the administrator or try email/password sign-in.');
+        // Log additional information for debugging
+        console.error('Unauthorized domain. Please add this domain to Firebase Authentication authorized domains:', window.location.origin);
       } else {
         setError('Failed to sign in with Google: ' + err.message);
       }

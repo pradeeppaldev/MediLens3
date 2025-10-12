@@ -29,6 +29,16 @@ service cloud.firestore {
       match /doctors/{doctorId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
+
+      // Allow authenticated users to read/write their own symptoms
+      match /symptoms/{symptomId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Allow authenticated users to read/write their own vitals
+      match /vitals/{vitalId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
     }
     
     // Allow public read access to static data if needed (optional)

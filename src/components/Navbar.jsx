@@ -99,7 +99,7 @@ const Navbar = () => {
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full transition-transform hover:scale-105">
+                <Button variant="ghost" className="relative h-8 w-8 p-0 rounded-full transition-transform hover:scale-105">
                   {user?.photoURL ? (
                     <img
                       src={user.photoURL}

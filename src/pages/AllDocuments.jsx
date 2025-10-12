@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { FileText, Plus, Download, Eye, Calendar, Trash2 } from 'lucide-react';
+import { FileText, Plus, Download, Eye, Calendar, Trash2, Share2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../lib/firebase';
 import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
@@ -72,6 +72,16 @@ const AllDocuments = () => {
     document.body.removeChild(link);
   };
 
+  const handleShare = async (url) => {
+    try {
+      await navigator.clipboard.writeText(url);
+      alert('Download link copied to clipboard!');
+    } catch (err) {
+      console.error('Failed to copy link:', err);
+      alert('Failed to copy link. Please copy manually: ' + url);
+    }
+  };
+
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -93,15 +103,18 @@ const AllDocuments = () => {
       </div>
 
       {documents.length > 0 ? (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {documents.map((doc) => (
-            <Card key={doc.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <CardTitle className="flex items-center">
-                    <FileText className="h-5 w-5 mr-2 text-primary" />
-                    {doc.name || 'Unnamed Document'}
-                  </CardTitle>
+            <Card key={doc.id} className="hover:shadow-md transition-shadow">
+              <CardContent className="p-4">
+                <div className="flex justify-between items-start mb-3">
+                  <div className="aspect-square w-full mb-3 flex items-center justify-center bg-muted rounded-lg">
+                    {doc.type && doc.type.startsWith('image/') ? (
+                      <img src={doc.downloadURL} alt={doc.name || 'Document'} className="w-full h-full object-cover rounded" />
+                    ) : (
+                      <FileText className="h-12 w-12 text-muted-foreground" />
+                    )}
+                  </div>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -114,41 +127,27 @@ const AllDocuments = () => {
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">
-                    <strong>Type:</strong> {doc.type || 'Document'}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    <strong>Description:</strong> {doc.description || 'No description'}
-                  </p>
-                  <div className="flex items-center text-sm text-muted-foreground">
-                    <Calendar className="h-4 w-4 mr-1" />
-                    Uploaded: {doc.uploadDate ? new Date(doc.uploadDate.seconds * 1000).toLocaleDateString() : 'Unknown'}
-                  </div>
-                  <div className="flex space-x-2 mt-4">
-                    {doc.url && (
-                      <>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => window.open(doc.url, '_blank')}
-                        >
-                          <Eye className="h-4 w-4 mr-1" />
-                          View
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDownload(doc.url, doc.name || 'document')}
-                        >
-                          <Download className="h-4 w-4 mr-1" />
-                          Download
-                        </Button>
-                      </>
-                    )}
-                  </div>
+                <h4 className="font-medium truncate mb-1">{doc.fileName || 'Unnamed Document'}</h4>
+                <p className="text-sm text-muted-foreground mb-3">
+                  <Calendar className="h-4 w-4 inline mr-1" />
+                  {doc.uploadDate ? (() => {
+                    const date = new Date(doc.uploadDate);
+                    return !isNaN(date.getTime()) ? 'Uploaded on ' + date.toLocaleDateString() : 'Unknown';
+                  })() : 'Unknown'}
+                </p>
+                <div className="grid grid-cols-3 gap-1">
+                  <Button onClick={() => window.open(doc.downloadURL, '_blank')} size="sm" variant="outline" className="w-full">
+                    <Eye className="h-4 w-4 mr-1" />
+                    Open
+                  </Button>
+                  <Button onClick={() => handleShare(doc.downloadURL)} size="sm" variant="outline" className="w-full">
+                    <Share2 className="h-4 w-4 mr-1" />
+                    Share
+                  </Button>
+                  <Button onClick={() => handleDownload(doc.downloadURL, doc.fileName || 'document')} size="sm" variant="outline" className="w-full">
+                    <Download className="h-4 w-4 mr-1" />
+                    Download
+                  </Button>
                 </div>
               </CardContent>
             </Card>

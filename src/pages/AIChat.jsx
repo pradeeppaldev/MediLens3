@@ -45,8 +45,20 @@ const AIChat = () => {
 
     try {
       console.log('Calling gemini.chat');
-      const aiResponseContent = await gemini.chat(updatedMessages);
+      let aiResponseContent = await gemini.chat(updatedMessages);
       console.log('AI response content:', aiResponseContent);
+
+      // Clean markdown symbols for plain text
+      aiResponseContent = aiResponseContent
+        .replace(/^[#]{1,6}\s*/gm, '') // Remove headers
+        .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold
+        .replace(/\*(.*?)\*/g, '$1') // Remove italics
+        .replace(/`(.*?)`/g, '$1') // Remove inline code
+        .replace(/^-+\s*/gm, '') // Remove list dashes
+        .replace(/^\s*[-*+]\s+/gm, '') // Remove list bullets
+        .replace(/\n{3,}/g, '\n\n') // Normalize multiple newlines
+        .trim();
+
       const aiResponse = {
         id: messages.length + 2,
         type: 'ai',
@@ -77,15 +89,15 @@ const AIChat = () => {
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <Card className="h-[600px] flex flex-col">
-        <CardHeader>
+        <CardHeader className="flex-shrink-0">
           <CardTitle className="flex items-center">
             <MessageSquare className="h-5 w-5 mr-2" />
             AI Health Assistant
           </CardTitle>
         </CardHeader>
-        <CardContent className="flex-1 flex flex-col">
-          <div className="flex-1 pr-4 overflow-auto" ref={scrollAreaRef}>
-            <div className="space-y-4">
+        <CardContent className="flex-1 flex flex-col overflow-hidden">
+          <div className="flex-1 overflow-y-auto px-4 py-2" ref={scrollAreaRef}>
+            <div className="space-y-4 min-h-full">
               {messages.map((message) => (
                 <div
                   key={message.id}
@@ -107,7 +119,7 @@ const AIChat = () => {
                         : 'bg-gray-100 text-gray-900'
                     }`}
                   >
-                    <p className="text-sm">{message.content}</p>
+                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                     <p className="text-xs opacity-70 mt-1">
                       {message.timestamp.toLocaleTimeString([], {
                         hour: '2-digit',
@@ -143,7 +155,7 @@ const AIChat = () => {
               <div ref={lastMessageRef}></div>
             </div>
           </div>
-          <div className="flex space-x-2 mt-4">
+          <div className="flex space-x-2 mt-4 px-4 pb-4 border-t">
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}

@@ -1,7 +1,7 @@
 // Firebase configuration and initialization
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore, doc, setDoc } from 'firebase/firestore';
+import { getFirestore, doc, setDoc, updateDoc, onSnapshot } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 
@@ -24,9 +24,11 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 
+export { doc, updateDoc, onSnapshot };
+
 // Initialize Firebase Messaging (only in browser environments)
 export let messaging;
-if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+if (typeof window !== 'undefined' && 'serviceWorker' in navigator && !import.meta.env.DEV) {
   try {
     messaging = getMessaging(app);
   } catch (error) {
@@ -67,7 +69,7 @@ export const storeFCMToken = async (userId, token) => {
   if (!userId || !token) return;
 
   try {
-    const deviceId = navigator.userAgent; // Simple device ID
+    const deviceId = navigator.userAgent.replace(/\//g, '_').replace(/\s/g, '_').replace(/[^a-zA-Z0-9_]/g, '_'); // Sanitize device ID
     const deviceRef = doc(db, `users/${userId}/devices`, deviceId);
     await setDoc(deviceRef, {
       token,
@@ -84,6 +86,11 @@ export const storeFCMToken = async (userId, token) => {
 
 export const registerForNotifications = async (userId) => {
   try {
+    if (import.meta.env.DEV) {
+      console.log('Skipping notification registration in development');
+      return;
+    }
+
     await requestNotificationPermission();
     const token = await getFCMToken();
     await storeFCMToken(userId, token);

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Progress } from '@/components/ui/progress';
 import { Label } from '@/components/ui/label';
 import {
   Pill,
@@ -15,12 +16,155 @@ import {
   Bell,
   CheckCircle,
   AlertCircle,
-  FileText
+  FileText,
+  BarChart3,
+  TrendingUp
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { db, registerForNotifications } from '../lib/firebase';
 import { collection, getDocs, addDoc, query, orderBy, updateDoc, doc } from 'firebase/firestore';
 import AddEventModal from '../components/AddEventModal';
+import WeeklyAdherenceBarChart from '../components/WeeklyAdherenceBarChart';
+import StreaksComponent from '../components/StreaksComponent';
+import ProgressRing from '../components/ProgressRing';
+import { exportUserData } from '../lib/exportData';
+
+const addSampleData = async (user) => {
+  if (!user) return;
+
+  const userId = user.uid;
+
+  // Sample medicines
+  const sampleMedicines = [
+    {
+      name: 'Aspirin',
+      dosage: '81mg',
+      frequency: 'Once daily',
+      scheduleTimes: ['08:00'],
+      startDate: '2024-01-01',
+      endDate: '2024-12-31',
+      instructions: 'Take with food',
+      enableNotifications: true,
+      doses: [
+        { time: '08:00', status: 'taken', takenAt: new Date('2024-01-15T08:00:00') },
+        { time: '08:00', status: 'taken', takenAt: new Date('2024-01-16T08:00:00') },
+        { time: '08:00', status: 'pending' }
+      ]
+    },
+    {
+      name: 'Lisinopril',
+      dosage: '10mg',
+      frequency: 'Once daily',
+      scheduleTimes: ['09:00'],
+      startDate: '2024-01-01',
+      endDate: '2024-12-31',
+      instructions: 'Take in the morning',
+      enableNotifications: true,
+      doses: [
+        { time: '09:00', status: 'taken', takenAt: new Date('2024-01-15T09:00:00') },
+        { time: '09:00', status: 'taken', takenAt: new Date('2024-01-16T09:00:00') },
+        { time: '09:00', status: 'pending' }
+      ]
+    }
+  ];
+
+  for (const med of sampleMedicines) {
+    await addDoc(collection(db, `users/${userId}/medicines`), med);
+  }
+
+  // Sample documents
+  const sampleDocuments = [
+    {
+      fileName: 'Blood Test Results.pdf',
+      uploadDate: new Date('2024-01-10'),
+      url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+      description: 'Recent blood test results'
+    },
+    {
+      fileName: 'Prescription Scan.jpg',
+      uploadDate: new Date('2024-01-12'),
+      url: 'https://via.placeholder.com/300x300.jpg?text=Prescription',
+      description: 'Scanned prescription'
+    }
+  ];
+
+  for (const doc of sampleDocuments) {
+    await addDoc(collection(db, `users/${userId}/documents`), doc);
+  }
+
+  // Sample symptoms
+  const sampleSymptoms = [
+    {
+      symptom: 'Headache',
+      severity: 3,
+      notes: 'Mild headache after taking medication',
+      date: new Date('2024-01-14')
+    },
+    {
+      symptom: 'Fatigue',
+      severity: 2,
+      notes: 'Feeling tired in the afternoon',
+      date: new Date('2024-01-15')
+    }
+  ];
+
+  for (const sym of sampleSymptoms) {
+    await addDoc(collection(db, `users/${userId}/symptoms`), sym);
+  }
+
+  // Sample vitals
+  const sampleVitals = [
+    {
+      type: 'Blood Pressure',
+      value: '120/80',
+      notes: 'Morning reading',
+      date: new Date('2024-01-14T08:00:00')
+    },
+    {
+      type: 'Heart Rate',
+      value: '72 bpm',
+      notes: 'Resting heart rate',
+      date: new Date('2024-01-14T08:00:00')
+    }
+  ];
+
+  for (const vit of sampleVitals) {
+    await addDoc(collection(db, `users/${userId}/vitals`), vit);
+  }
+
+  // Sample doctors
+  const sampleDoctors = [
+    {
+      name: 'Dr. Sarah Johnson',
+      type: 'Cardiologist',
+      phone: '+1-555-0123',
+      email: 'sarah.johnson@hospital.com',
+      address: '123 Heart St, Medical City, MC 12345',
+      notes: 'Primary cardiologist'
+    }
+  ];
+
+  for (const doc of sampleDoctors) {
+    await addDoc(collection(db, `users/${userId}/doctors`), doc);
+  }
+
+  // Sample events
+  const sampleEvents = [
+    {
+      title: 'Cardiology Appointment',
+      type: 'appointment',
+      date: new Date('2024-01-20'),
+      time: '10:00',
+      notes: 'Follow-up appointment with Dr. Johnson'
+    }
+  ];
+
+  for (const event of sampleEvents) {
+    await addDoc(collection(db, `users/${userId}/events`), event);
+  }
+
+  alert('Sample data added successfully! Refresh the page to see the data.');
+};
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -34,6 +178,9 @@ const Dashboard = () => {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedMedicine, setSelectedMedicine] = useState(null);
   const [showMedicineModal, setShowMedicineModal] = useState(false);
+  const [showProgressModal, setShowProgressModal] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [progressText, setProgressText] = useState('');
 
   useEffect(() => {
     const fetchMedicines = async () => {
@@ -259,6 +406,12 @@ const Dashboard = () => {
 
   const quickActions = [
     {
+      label: 'Add Sample Data',
+      icon: Plus,
+      color: 'bg-red-500 hover:bg-red-600',
+      action: () => addSampleData(user)
+    },
+    {
       label: 'Upload Document',
       icon: FileText,
       color: 'bg-blue-500 hover:bg-blue-600',
@@ -280,7 +433,19 @@ const Dashboard = () => {
       label: 'Export Data',
       icon: Download,
       color: 'bg-orange-500 hover:bg-orange-600',
-      action: () => navigate('/export')
+      action: async () => {
+        setShowProgressModal(true);
+        setProgress(0);
+        setProgressText('Starting export...');
+        try {
+          await exportUserData(user, setProgress, setProgressText);
+        } catch (error) {
+          console.error('Export failed:', error);
+          setProgressText('Export failed');
+        } finally {
+          setTimeout(() => setShowProgressModal(false), 1000);
+        }
+      }
     }
   ];
 
@@ -395,6 +560,28 @@ const Dashboard = () => {
                 </Button>
               </div>
             )}
+          </CardContent>
+        </Card>
+
+        {/* Analytics Overview */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <BarChart3 className="h-5 w-5 mr-2" />
+              Health Analytics
+            </CardTitle>
+            <CardDescription>Track your medication adherence and progress</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+              <div className="lg:col-span-2">
+                <WeeklyAdherenceBarChart />
+              </div>
+              <div className="space-y-4">
+                <ProgressRing />
+                <StreaksComponent />
+              </div>
+            </div>
           </CardContent>
         </Card>
 
@@ -579,6 +766,20 @@ const Dashboard = () => {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Export Progress Modal */}
+      <Dialog open={showProgressModal} onOpenChange={setShowProgressModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Exporting Data</DialogTitle>
+            <DialogDescription>Please wait while we prepare your health data export.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Progress value={progress} className="w-full" />
+            <p className="text-sm text-muted-foreground">{progressText}</p>
+          </div>
         </DialogContent>
       </Dialog>
     </>

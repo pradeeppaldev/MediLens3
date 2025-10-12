@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../lib/firebase';
 import { collection, onSnapshot } from 'firebase/firestore';
 
-const AnalyticsChart = ({ timeRange }) => {
+const WeeklyAdherenceBarChart = () => {
   const { user } = useAuth();
   const [medicines, setMedicines] = useState([]);
-  const [adherenceData, setAdherenceData] = useState([]);
+  const [chartData, setChartData] = useState([]);
 
   useEffect(() => {
     if (!user) return;
@@ -22,13 +22,13 @@ const AnalyticsChart = ({ timeRange }) => {
 
   useEffect(() => {
     const now = new Date();
-    const days = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : timeRange === '90d' ? 90 : timeRange === 'all' ? 365 : 30;
     const data = [];
 
-    for (let i = days - 1; i >= 0; i--) {
+    for (let i = 6; i >= 0; i--) {
       const date = new Date(now);
       date.setDate(date.getDate() - i);
       const dateStr = date.toISOString().split('T')[0];
+      const day = date.toLocaleDateString('en-US', { weekday: 'short' });
 
       let taken = 0;
 
@@ -46,23 +46,23 @@ const AnalyticsChart = ({ timeRange }) => {
         }
       });
 
-      const adherence = taken > 0 ? 100 : 0; // Simplified: 100% if at least one dose taken
       data.push({
-        date: date.toLocaleDateString(),
-        adherence
+        day,
+        taken,
+        missed: 0 // For now, set missed to 0; can be calculated based on schedule later
       });
     }
 
-    setAdherenceData(data);
-  }, [medicines, timeRange]);
+    setChartData(data);
+  }, [medicines]);
 
   return (
     <div className="bg-card rounded-lg p-6 shadow-sm">
-      <h3 className="text-lg font-semibold text-foreground mb-4">Adherence Trend</h3>
-      <div className="h-80">
+      <h3 className="text-lg font-semibold text-foreground mb-4">Weekly Adherence</h3>
+      <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart
-            data={adherenceData}
+          <BarChart
+            data={chartData}
             margin={{
               top: 5,
               right: 30,
@@ -71,16 +71,17 @@ const AnalyticsChart = ({ timeRange }) => {
             }}
           >
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" />
-            <YAxis domain={[0, 100]} />
+            <XAxis dataKey="day" />
+            <YAxis />
             <Tooltip />
             <Legend />
-            <Line type="monotone" dataKey="adherence" stroke="#6366f1" name="Adherence %" />
-          </LineChart>
+            <Bar dataKey="taken" stackId="a" fill="#10b981" name="Taken" />
+            <Bar dataKey="missed" stackId="a" fill="#ef4444" name="Missed" />
+          </BarChart>
         </ResponsiveContainer>
       </div>
     </div>
   );
 };
 
-export default AnalyticsChart;
+export default WeeklyAdherenceBarChart;

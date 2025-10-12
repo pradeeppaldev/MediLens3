@@ -17,6 +17,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Analytics from './pages/Analytics';
 import AIChat from './pages/AIChat';
+import Reminders from './pages/Reminders';
+import HealthMonitor from './pages/HealthMonitor';
 import FloatingChatButton from './components/FloatingChatButton';
 
 // Protected route component
@@ -153,6 +155,20 @@ function App() {
         <ProtectedRoute>
           <AppLayout>
             <AIChat />
+          </AppLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/reminders" element={
+        <ProtectedRoute>
+          <AppLayout>
+            <Reminders />
+          </AppLayout>
+        </ProtectedRoute>
+      } />
+      <Route path="/monitor" element={
+        <ProtectedRoute>
+          <AppLayout>
+            <HealthMonitor />
           </AppLayout>
         </ProtectedRoute>
       } />

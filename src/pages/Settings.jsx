@@ -1,7 +1,43 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Settings as SettingsIcon, Bell, Shield, Palette, Database, User, Key } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
+import { db, doc, updateDoc, onSnapshot } from '../lib/firebase';
 
 const Settings = () => {
+  const { user } = useAuth();
+  const { theme, toggleTheme } = useTheme();
+  const [emailNotifications, setEmailNotifications] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const userRef = doc(db, 'users', user.uid);
+    const unsubscribe = onSnapshot(userRef, (docSnap) => {
+      if (docSnap.exists()) {
+        setEmailNotifications(docSnap.data().emailNotifications || false);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [user]);
+
+  const handleEmailToggle = async () => {
+    if (!user) return;
+
+    try {
+      const userRef = doc(db, 'users', user.uid);
+      await updateDoc(userRef, {
+        emailNotifications: !emailNotifications
+      });
+      setEmailNotifications(!emailNotifications);
+    } catch (error) {
+      console.error('Error updating email notifications:', error);
+    }
+  };
+
+  const isDark = theme === 'dark';
+
   return (
     <div className="min-h-screen bg-background dark:bg-background py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -55,8 +91,11 @@ const Settings = () => {
                     </div>
                     <div className="flex items-center">
                       <span className="mr-2 text-sm text-muted-foreground">Light</span>
-                      <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-accent">
-                        <span className="inline-block h-4 w-4 transform rounded-full bg-white transition translate-x-6"></span>
+                      <button 
+                        className="relative inline-flex h-6 w-11 items-center rounded-full bg-accent"
+                        onClick={toggleTheme}
+                      >
+                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${isDark ? 'translate-x-6' : 'translate-x-1'}`}></span>
                       </button>
                       <span className="ml-2 text-sm text-muted-foreground">Dark</span>
                     </div>
@@ -69,8 +108,11 @@ const Settings = () => {
                       <h3 className="text-sm font-medium text-foreground dark:text-foreground">Email Notifications</h3>
                       <p className="text-sm text-muted-foreground">Receive email updates about your account</p>
                     </div>
-                    <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-accent">
-                      <span className="inline-block h-4 w-4 transform rounded-full bg-white transition translate-x-6"></span>
+                    <button 
+                      className="relative inline-flex h-6 w-11 items-center rounded-full bg-accent"
+                      onClick={handleEmailToggle}
+                    >
+                      <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${emailNotifications ? 'translate-x-6' : 'translate-x-1'}`}></span>
                     </button>
                   </div>
                 </div>

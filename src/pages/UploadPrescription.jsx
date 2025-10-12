@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Upload, Camera, FileText, CheckCircle, AlertCircle, Loader2, Share2 } from 'lucide-react';
+import { Upload, Camera, FileText, CheckCircle, AlertCircle, Loader2, Share2, Eye } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../lib/firebase';
 import { doc, setDoc, collection, getDocs } from 'firebase/firestore';
@@ -320,10 +320,16 @@ const UploadPrescription = () => {
                     <p className="text-sm text-muted-foreground mb-3">
                       {new Date(doc.uploadDate).toLocaleDateString()}
                     </p>
-                    <Button onClick={() => handleShare(doc.downloadURL)} size="sm" variant="outline" className="w-full">
-                      <Share2 className="h-4 w-4 mr-2" />
-                      Share
-                    </Button>
+                    <div className="flex space-x-2">
+                      <Button onClick={() => window.open(doc.downloadURL, '_blank')} size="sm" variant="outline" className="flex-1">
+                        <Eye className="h-4 w-4 mr-2" />
+                        Open
+                      </Button>
+                      <Button onClick={() => handleShare(doc.downloadURL)} size="sm" variant="outline" className="flex-1">
+                        <Share2 className="h-4 w-4 mr-2" />
+                        Share
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               ))}

@@ -12,7 +12,8 @@ import {
   Bell,
   Stethoscope,
   Heart,
-  Activity
+  Activity,
+  Upload
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '../context/ThemeContext';
@@ -27,6 +28,7 @@ const Sidebar = () => {
     { name: 'Dashboard', href: '/', icon: Home },
     { name: 'Medications', href: '/medications', icon: Pill },
     { name: 'Reminders', href: '/reminders', icon: Bell },
+    { name: 'Upload Document', href: '/prescriptions/upload', icon: Upload },
     { name: 'All Documents', href: '/documents', icon: FileText },
     { name: 'Analytics', href: '/analytics', icon: BarChart3 },
     { name: 'Health Monitor', href: '/monitor', icon: Activity },

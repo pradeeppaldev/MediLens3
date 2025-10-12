@@ -22,6 +22,9 @@ const UploadPrescription = () => {
 
   const cameraInputRef = useRef(null);
 
+  // Check if Cloudinary is configured
+  const isCloudinaryConfigured = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME && import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+
   const fetchDocuments = async () => {
     if (!user) return;
     try {
@@ -157,6 +160,16 @@ const UploadPrescription = () => {
           <CardDescription>
             Store your medical documents (images, reports, PDFs) securely in the cloud
           </CardDescription>
+          {!isCloudinaryConfigured && (
+            <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg mt-4">
+              <div className="flex items-center">
+                <AlertCircle className="h-5 w-5 text-yellow-600 mr-2" />
+                <p className="text-yellow-700 text-sm">
+                  Upload functionality is not configured. Please contact the administrator to set up Cloudinary credentials.
+                </p>
+              </div>
+            </div>
+          )}
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Upload Methods */}
@@ -310,7 +323,7 @@ const UploadPrescription = () => {
                 <Card key={doc.id} className="hover:shadow-md transition-shadow">
                   <CardContent className="p-4">
                     <div className="aspect-square mb-3 flex items-center justify-center bg-muted rounded-lg">
-                      {doc.fileType.startsWith('image/') ? (
+                      {doc.fileType && doc.fileType.startsWith('image/') ? (
                         <img src={doc.downloadURL} alt={doc.fileName} className="w-full h-full object-cover rounded" />
                       ) : (
                         <FileText className="h-12 w-12 text-muted-foreground" />

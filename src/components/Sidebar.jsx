@@ -13,7 +13,9 @@ import {
   Stethoscope,
   Heart,
   Activity,
-  Upload
+  Upload,
+  DollarSign,
+  MapPin
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '../context/ThemeContext';
@@ -33,6 +35,8 @@ const Sidebar = () => {
     { name: 'Analytics', href: '/analytics', icon: BarChart3 },
     { name: 'Health Monitor', href: '/monitor', icon: Activity },
     { name: 'Doctors', href: '/doctors', icon: Stethoscope },
+    { name: 'Expense Tracker', href: '/expense-tracker', icon: DollarSign },
+    { name: 'Pharmacy Locator', href: '/pharmacy-locator', icon: MapPin },
   ];
 
   const isActive = (path) => {

@@ -3,20 +3,27 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import { Button } from '@/components/ui/button';
-import { 
-  Moon, 
-  Sun, 
-  Camera, 
-  Home, 
-  User, 
-  Settings, 
+import {
+  Moon,
+  Sun,
+  Camera,
+  Home,
+  User,
+  Settings,
   LogOut,
   Menu,
   X,
   Pill,
   Stethoscope,
   Brain,
-  Heart
+  Heart,
+  Bell,
+  FileText,
+  BarChart3,
+  Activity,
+  Upload,
+  DollarSign,
+  MapPin
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -41,11 +48,26 @@ const Navbar = () => {
     }
   };
 
-  const navItems = [
-    { name: 'Home', path: '/', icon: Home },
+  // Desktop navigation items (limited)
+  const desktopNavItems = [
+    { name: 'Dashboard', path: '/', icon: Home },
     { name: 'Medications', path: '/medications', icon: Pill },
-    { name: 'Profile', path: '/profile', icon: User },
-    { name: 'Settings', path: '/settings', icon: Settings },
+    { name: 'Health Monitor', path: '/monitor', icon: Activity },
+  ];
+
+  // Mobile navigation items (all items)
+  const mobileNavItems = [
+    { name: 'Dashboard', path: '/', icon: Home },
+    { name: 'Medications', path: '/medications', icon: Pill },
+    { name: 'Reminders', path: '/reminders', icon: Bell },
+    { name: 'Upload Document', path: '/prescriptions/upload', icon: Upload },
+    { name: 'All Documents', path: '/documents', icon: FileText },
+    { name: 'Analytics', path: '/analytics', icon: BarChart3 },
+    { name: 'Health Monitor', path: '/monitor', icon: Activity },
+    { name: 'Doctors', path: '/doctors', icon: Stethoscope },
+    { name: 'Expense Tracker', path: '/expense-tracker', icon: DollarSign },
+    { name: 'Pharmacy Locator', path: '/pharmacy-locator', icon: MapPin },
+    { name: 'AI Health Chat', path: '/ai-chat', icon: Brain },
   ];
 
   return (
@@ -63,7 +85,7 @@ const Navbar = () => {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-1">
-          {navItems.map((item) => {
+          {desktopNavItems.map((item) => {
             const Icon = item.icon;
             return (
               <Link
@@ -122,6 +144,10 @@ const Navbar = () => {
                     {user.email}
                   </p>
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/profile')}>
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profile</span>
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleLogout}>
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Log out</span>
@@ -160,7 +186,7 @@ const Navbar = () => {
               </Link>
               <div className="my-4 h-[calc(100vh-8rem)] overflow-y-auto">
                 <div className="flex flex-col space-y-3">
-                  {navItems.map((item) => {
+                  {mobileNavItems.map((item) => {
                     const Icon = item.icon;
                     return (
                       <Link

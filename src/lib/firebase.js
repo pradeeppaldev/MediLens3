@@ -16,6 +16,8 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
+// Note: Google Maps integration removed - using mock data instead
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 

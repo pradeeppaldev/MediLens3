@@ -33,8 +33,16 @@ const addSampleData = async (user) => {
   if (!user) return;
 
   const userId = user.uid;
+  const now = new Date();
 
-  // Sample medicines
+  // Helper function to get date string for past days
+  const getDateString = (daysAgo) => {
+    const date = new Date(now);
+    date.setDate(date.getDate() - daysAgo);
+    return date.toISOString().split('T')[0];
+  };
+
+  // Sample medicines - 5 different medications with doses for the last 7 days
   const sampleMedicines = [
     {
       name: 'Aspirin',
@@ -45,11 +53,11 @@ const addSampleData = async (user) => {
       endDate: '2024-12-31',
       instructions: 'Take with food',
       enableNotifications: true,
-      doses: [
-        { time: '08:00', status: 'taken', takenAt: new Date('2024-01-15T08:00:00') },
-        { time: '08:00', status: 'taken', takenAt: new Date('2024-01-16T08:00:00') },
-        { time: '08:00', status: 'pending' }
-      ]
+      doses: Array.from({ length: 7 }, (_, i) => ({
+        time: '08:00',
+        status: 'taken',
+        takenAt: new Date(`${getDateString(i)}T08:00:00`)
+      }))
     },
     {
       name: 'Lisinopril',
@@ -60,11 +68,63 @@ const addSampleData = async (user) => {
       endDate: '2024-12-31',
       instructions: 'Take in the morning',
       enableNotifications: true,
+      doses: Array.from({ length: 7 }, (_, i) => ({
+        time: '09:00',
+        status: 'taken',
+        takenAt: new Date(`${getDateString(i)}T09:00:00`)
+      }))
+    },
+    {
+      name: 'Metformin',
+      dosage: '500mg',
+      frequency: 'Twice daily',
+      scheduleTimes: ['08:00', '20:00'],
+      startDate: '2024-01-01',
+      endDate: '2024-12-31',
+      instructions: 'Take with meals',
+      enableNotifications: true,
       doses: [
-        { time: '09:00', status: 'taken', takenAt: new Date('2024-01-15T09:00:00') },
-        { time: '09:00', status: 'taken', takenAt: new Date('2024-01-16T09:00:00') },
-        { time: '09:00', status: 'pending' }
+        ...Array.from({ length: 7 }, (_, i) => ({
+          time: '08:00',
+          status: 'taken',
+          takenAt: new Date(`${getDateString(i)}T08:00:00`)
+        })),
+        ...Array.from({ length: 7 }, (_, i) => ({
+          time: '20:00',
+          status: 'taken',
+          takenAt: new Date(`${getDateString(i)}T20:00:00`)
+        }))
       ]
+    },
+    {
+      name: 'Atorvastatin',
+      dosage: '20mg',
+      frequency: 'Once daily',
+      scheduleTimes: ['22:00'],
+      startDate: '2024-01-01',
+      endDate: '2024-12-31',
+      instructions: 'Take at bedtime',
+      enableNotifications: true,
+      doses: Array.from({ length: 7 }, (_, i) => ({
+        time: '22:00',
+        status: 'taken',
+        takenAt: new Date(`${getDateString(i)}T22:00:00`)
+      }))
+    },
+    {
+      name: 'Omeprazole',
+      dosage: '20mg',
+      frequency: 'Once daily',
+      scheduleTimes: ['07:00'],
+      startDate: '2024-01-01',
+      endDate: '2024-12-31',
+      instructions: 'Take 30 minutes before breakfast',
+      enableNotifications: true,
+      doses: Array.from({ length: 7 }, (_, i) => ({
+        time: '07:00',
+        status: 'taken',
+        takenAt: new Date(`${getDateString(i)}T07:00:00`)
+      }))
     }
   ];
 
@@ -148,7 +208,7 @@ const addSampleData = async (user) => {
     await addDoc(collection(db, `users/${userId}/doctors`), doc);
   }
 
-  // Sample events
+  // Sample events - 5 different events
   const sampleEvents = [
     {
       title: 'Cardiology Appointment',
@@ -156,6 +216,34 @@ const addSampleData = async (user) => {
       date: new Date('2024-01-20'),
       time: '10:00',
       notes: 'Follow-up appointment with Dr. Johnson'
+    },
+    {
+      title: 'Blood Test',
+      type: 'test',
+      date: new Date('2024-01-22'),
+      time: '09:00',
+      notes: 'Annual blood work and cholesterol check'
+    },
+    {
+      title: 'Refill Prescription',
+      type: 'refill',
+      date: new Date('2024-01-25'),
+      time: '14:00',
+      notes: 'Pick up Lisinopril prescription at pharmacy'
+    },
+    {
+      title: 'Dental Check-up',
+      type: 'appointment',
+      date: new Date('2024-01-28'),
+      time: '11:30',
+      notes: 'Regular cleaning and examination'
+    },
+    {
+      title: 'Eye Exam',
+      type: 'appointment',
+      date: new Date('2024-02-05'),
+      time: '15:00',
+      notes: 'Annual vision screening'
     }
   ];
 
@@ -163,6 +251,8 @@ const addSampleData = async (user) => {
     await addDoc(collection(db, `users/${userId}/events`), event);
   }
 
+  // Hide the "Add Sample Data" button after adding data
+  localStorage.setItem(`sampleDataAdded_${userId}`, 'true');
   alert('Sample data added successfully! Refresh the page to see the data.');
 };
 
@@ -181,6 +271,7 @@ const Dashboard = () => {
   const [showProgressModal, setShowProgressModal] = useState(false);
   const [progress, setProgress] = useState(0);
   const [progressText, setProgressText] = useState('');
+  const [sampleDataAdded, setSampleDataAdded] = useState(false);
 
   useEffect(() => {
     const fetchMedicines = async () => {
@@ -231,6 +322,13 @@ const Dashboard = () => {
     };
 
     fetchEvents();
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      const hasAddedSampleData = localStorage.getItem(`sampleDataAdded_${user.uid}`) === 'true';
+      setSampleDataAdded(hasAddedSampleData);
+    }
   }, [user]);
 
   // Request notification permission on load
@@ -405,7 +503,7 @@ const Dashboard = () => {
   };
 
   const quickActions = [
-    {
+    !sampleDataAdded && {
       label: 'Add Sample Data',
       icon: Plus,
       color: 'bg-red-500 hover:bg-red-600',
@@ -447,7 +545,7 @@ const Dashboard = () => {
         }
       }
     }
-  ];
+  ].filter(Boolean);
 
   return (
     <>

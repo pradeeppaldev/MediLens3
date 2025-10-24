@@ -72,14 +72,11 @@ export const gemini = {
   // Chat with AI assistant
   chat: async (messages) => {
     console.log('chat function called with messages:', messages);
-    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-    console.log('API key present:', !!apiKey);
-    if (!apiKey) {
-      throw new Error('Gemini API key is not configured. Please add VITE_GEMINI_API_KEY to your .env file.');
-    }
 
     try {
-      const ai = new GoogleGenAI({ apiKey });
+      // Use the provided API key pattern from the sample
+      const ai = new GoogleGenAI({ apiKey: 'AIzaSyBJ-qgBq_qLXSkCWzcfL56JZp8YAmDGJ7s' });
+
       const conversation = messages.map(msg => `${msg.type === 'ai' ? 'Assistant' : 'User'}: ${msg.content}`).join('\n');
       console.log('Conversation:', conversation);
       const prompt = `You are a helpful AI health assistant. Provide accurate, empathetic, and general health information. Always recommend consulting a healthcare professional for medical advice. Do not diagnose or prescribe treatments.\n\n${conversation}\nAssistant:`;

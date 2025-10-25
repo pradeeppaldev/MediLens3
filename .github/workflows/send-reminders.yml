@@ -2,7 +2,7 @@ name: Send Medicine Reminders
 
 on:
   schedule:
-    - cron: "* * * * *"
+    - cron: "*/5 * * * *"  # Run every 5 minutes instead of every minute
   workflow_dispatch: # Allow manual trigger for testing
 
 jobs:

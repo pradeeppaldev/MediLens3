@@ -1,10 +1,22 @@
 const admin = require('firebase-admin');
 
 // Initialize Firebase Admin with service account
-const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
+let serviceAccount;
+try {
+  serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+} catch (error) {
+  console.error("Error parsing FIREBASE_SERVICE_ACCOUNT_KEY:", error.message);
+  process.exit(1);
+}
+
+try {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+  });
+} catch (error) {
+  console.error("Error initializing Firebase Admin:", error.message);
+  process.exit(1);
+}
 
 async function sendMedicineReminders() {
   console.log("Checking for due medicine reminders");

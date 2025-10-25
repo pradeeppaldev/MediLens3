@@ -21,6 +21,11 @@ jobs:
         run: npm install firebase-admin
 
       - name: Send reminders
-        run: node scripts/send-reminders.cjs
+        run: |
+          if [ -z "$FIREBASE_SERVICE_ACCOUNT_KEY" ]; then
+            echo "FIREBASE_SERVICE_ACCOUNT_KEY secret is not set. Please configure it in repository secrets."
+            exit 1
+          fi
+          node scripts/send-reminders.cjs
         env:
           FIREBASE_SERVICE_ACCOUNT_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
